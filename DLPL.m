@@ -16,9 +16,9 @@
 % sj1_block1.mat.
 %% set up some stim parameters
 cl;
-% ========== parameters you want to change
+% ========== parameters you want to change ==========
 fname          ='junk_block1'; 
-p.noiseLevel   = 8;  
+p.noiseLevel   = 8;  %0 ~ 7
 p.corner       ='NE'; 
 p.startContrast=[0.9 0.9];
 % =========================================
@@ -61,7 +61,7 @@ gabor1=sind(360*p.sf*(x*cosd(p.rAngle-p.dAngle)+y*sind(p.rAngle-p.dAngle))); %-1
 gabor2=sind(360*p.sf*(x*cosd(p.rAngle+p.dAngle)+y*sind(p.rAngle+p.dAngle))); %-1~1
 gabor1=gabor1.*exp(-((x.^2+y.^2)/2/p.sigma.^2)); % apply mask?%-1~1
 gabor2=gabor2.*exp(-((x.^2+y.^2)/2/p.sigma.^2)); % apply mask?%-1~1
-outCircle=(x.^2+y.^2>p.stimsize.^2); % circle mask
+outCircle=((x.^2+y.^2)>p.stimradius.^2); % circle mask
 tex=zeros(1,2); % prealocate noise tex
 %% set up staircases
 % Random order for two staircases, up/low location and rotating angle.
@@ -90,19 +90,27 @@ for i=1:p.nTrials
     
     % generate noise patch, we first try noise level = 0;
     for j=1:2 % make 2 noise tex for each trial
-        img=gNoise(mN)*p.noiseLevel+0.5; % [0 1]
+        img=gNoise(mN)*p.noiseLevel/2; % [-0.5*p.noiseLevel/2, 0.5*p.noiseLevel/2]
         img=Expand(img,p.factor);
-        img(outCircle)=0.5; % circle mask
-        noise{j}=img;
+        img(outCircle) = 0; % circle mask
+        noise{j}=img; %
     end
     
     if cw(i)==-1% + 12deg
-        gabortmp=uint8(127*gabor1*con+127); %0~254, we change the contrast,
+        %gabortmp = 127*gabor1*con+127; %0~254, we change the contrast,
+        % want to add noise?
+        gabortmp = 127*(gabor1+noise{1})*con+127; %0~254,we change the contrast
     else
-        gabortmp=uint8(127*gabor2*con+127); %0~254, we change the contrast,
+        %gabortmp = 127*gabor2*con+127; %0~254, we change the contrast,
+        gabortmp = 127*(gabor2+noise{1})*con+127; %0~254,we change the contrast
     end
     %create a gray image
+    
     imgtmp = 127*ones(p.screenRect(4),p.screenRect(3));
+    
+    
+    
+    
     % put gabor on gray background
     imgtmp(r(2)+1:r(4),r(1)+1:r(3))=gabortmp;
     imgtmp=uint8(imgtmp);
@@ -114,7 +122,7 @@ for i=1:p.nTrials
     figure;imshow(imgtmp);
     drawnow;
     
-    [choice, secs]=WaitTill(KbName({'LeftArrow', 'RightArrow'})); % for response); % wait for response;
+    [choice, secs]=WaitTill(KbName({'LeftArrow', 'RightArrow','Escape'})); % for response); % wait for response;
 
     close all;
     %% =================
