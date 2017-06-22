@@ -18,7 +18,7 @@
 cl;
 % ========== parameters you want to change
 fname          ='junk_block1'; 
-p.noiseLevel   = 1;  
+p.noiseLevel   = 8;  
 p.corner       ='NE'; 
 p.startContrast=[0.9 0.9];
 % =========================================
@@ -28,11 +28,11 @@ p.screenheight = 30;%cm, for saving purpose
 p.screenRect = [0 0 600 600];%width,height
 p.offset = 81;
 p.stimradius = 1.5;%1.5deg, use deg here to create gabor
-p.stimsize = 60;
+p.stimsize = 60; % pixel
 p.rAngle = 55; % reference angle, -35 or 55
 p.dAngle = 12; % 5 high precision, 12 for low precision
 
-p.sf     = 2; %
+p.sf = 2; % spatial frequency
 p.stimradius = 1.5;%1.5deg, use deg here to create gabor
 p.sigma  = 0.4; % use deg, for creating gabor
 
@@ -44,7 +44,7 @@ p.rseed=ClockRandSeed; % set random number generator
 
 
 %% setup stimulus
-mN=round(p.stimsize*2/p.factor); % # of noise pixels, This is useful
+mN=round(p.stimsize/p.factor); % # of noise pixels, This is useful
 % derive stim location
 drect=CenterRect([0 0 p.stimsize p.stimsize],p.screenRect);
 if strcmpi(p.corner(1:2),'NE')
@@ -120,10 +120,10 @@ for i=1:p.nTrials
     %% =================
     
     % collect and update staircase
-    ok=(choice-1)==(cw(i)==1); % correct or not,cw=1,counterclockwise,cw=0,clockwise
-    data=[ok, cw(i)==1];
-    s(iSC(i))=staircase('update',s(iSC(i)),data);
-    rec(i,5:7)=[con data(1) choice==1];
+    ok = (choice-1)==(cw(i)==1); % correct or not,cw=1,counterclockwise,cw=0,clockwise
+    data = [ok, cw(i)==1];
+    s(iSC(i)) = staircase('update',s(iSC(i)),data);
+    rec(i,5:7) = [con data(1) choice==1];
 end % trials loop
 
 %% finish and save data
