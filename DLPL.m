@@ -18,7 +18,7 @@
 cl;
 % ========== parameters you want to change ==========
 fname          ='junk_block1'; 
-p.noiseLevel   = 8;  %0 ~ 7
+p.noiseLevel   = 0;  %0 ~ 7
 p.corner       ='NE'; 
 p.startContrast=[0.9 0.9];
 % =========================================
@@ -123,12 +123,17 @@ for i=1:p.nTrials
     drawnow;
     
     [choice, secs]=WaitTill(KbName({'LeftArrow', 'RightArrow','Escape'})); % for response); % wait for response;
+    
+    choice
 
     close all;
     %% =================
     
     % collect and update staircase
-    ok = (choice-1)==(cw(i)==1); % correct or not,cw=1,counterclockwise,cw=0,clockwise
+    
+    ok = (choice-1)==(cw(i)==1); % correct or not,cw=-1,counterclockwise,cw=1,clockwise
+    cw(i)
+    ok
     data = [ok, cw(i)==1];
     s(iSC(i)) = staircase('update',s(iSC(i)),data);
     rec(i,5:7) = [con data(1) choice==1];
