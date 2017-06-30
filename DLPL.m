@@ -55,12 +55,12 @@ p.rseed=ClockRandSeed; % set random number generator
 % relu6: poolShape = [ 12  12] clsShape = [4096 2]
 % relu7: poolShape = [ 12  12] clsShape = [4096 2]
 p.CNNModel = 'D:/CNNModel/imagenet-caffe-alex.mat';
-p.layerName = 'relu7';
+p.layerName = 'relu1';
 p.modelType = 'simplenn';
 p.useGPU = true;
-p.poolShape = [12 12];
+p.poolShape = [148 148];
 p.poolMethod = 'avg';
-p.clsShape = [4096 2];
+p.clsShape = [96 2];
 p.substractAverage = true;
 p.learningRate = 1e-3;
 p.weightDecay = 5e-4;
@@ -133,6 +133,7 @@ for i=1:p.nTrials
         img(outCircle)=0.5; % circle mask
         noise{j}=img;
     end
+    imshow(noise{j});
     
     if cw(i)==-1% + 12deg
         gabortmp=uint8(127*gabor1*con+127); %0~254, we change the contrast,
