@@ -133,7 +133,6 @@ for i=1:p.nTrials
         img(outCircle)=0.5; % circle mask
         noise{j}=img;
     end
-    imshow(noise{j});
     
     if cw(i)==-1% + 12deg
         gabortmp=uint8(127*gabor1*con+127); %0~254, we change the contrast,
