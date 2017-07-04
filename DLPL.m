@@ -55,12 +55,12 @@ p.rseed=ClockRandSeed; % set random number generator
 % relu6: poolShape = [ 12  12] clsShape = [4096 2]
 % relu7: poolShape = [ 12  12] clsShape = [4096 2]
 p.CNNModel = 'D:/CNNModel/imagenet-caffe-alex.mat';
-p.layerName = 'relu7';
+p.layerName = 'relu1';
 p.modelType = 'simplenn';
 p.useGPU = true;
-p.poolShape = [12 12];
+p.poolShape = [148 148];
 p.poolMethod = 'avg';
-p.clsShape = [4096 2];
+p.clsShape = [96 2];
 p.substractAverage = true;
 p.learningRate = 1e-3;
 p.weightDecay = 5e-4;
@@ -81,7 +81,7 @@ state = initState(net, p);
 
 
 %% setup stimulus
-mN=round(p.stimsize*2/p.factor); % # of noise pixels, This is useful
+mN=round(p.stimsize/p.factor); % # of noise pixels, This is useful
 % derive stim location
 drect=CenterRect([0 0 p.stimsize p.stimsize],p.screenRect);
 if strcmpi(p.corner(1:2),'NE')
