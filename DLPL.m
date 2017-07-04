@@ -20,7 +20,7 @@ KbName('UnifyKeyNames');
 
 % ========== parameters you want to change
 fname          ='junk_block1'; 
-p.noiseLevel   = 1;  
+p.noiseLevel   = 2;  %0 ~ 7
 p.corner       ='NE'; 
 p.startContrast=[0.9 0.9];
 % =========================================
@@ -149,28 +149,24 @@ for i=1:p.nTrials
     % imgtmp is the image to provide to Alexnet. Then Alexnet should make a
     % choice here. 1:counterclockwise rotated;2:clockwise rotated
     % choice = 1 or 2,
-    choice = net_predict(net, imgtmp, p);
-%     [choice, secs]=WaitTill(KbName({'LeftArrow', 'RightArrow'})); % for response); % wait for response;
+
+
+    figure;imshow(imgtmp);
+    drawnow;
+    
+    [choice, secs]=WaitTill(KbName({'LeftArrow', 'RightArrow','Escape'})); % for response); % wait for response;
+    
+    choice
 
     close all;
     %% =================
-    % collect and update staircase
-    ok=(choice-1)==(cw(i)==1); % correct or not,cw=-1,counterclockwise,cw=1,clockwise
-    data=[ok, cw(i)==1];
-    s(iSC(i))=staircase('update',s(iSC(i)),data);
-    rec(i,5:7)=[con data(1) choice==1];
-    
-    if ~ok
-        if cw(i) == 1, label = 2;
-        else label = 1; 
-        end
-        [net, state, loss{n}] = net_train(net, state, imgtmp, label, p);
-        fprintf('trial %d / %d loss %.2f\n', i, p.nTrials, loss{n});
-        n = n + 1;
-    else
-        fprintf('trial %d / %d\n', i, p.nTrials);
-    end
-
+    % collect and update staircase    
+    ok = (choice-1)==(cw(i)==1); % correct or not,cw=-1,counterclockwise,cw=1,clockwise
+    cw(i)
+    ok
+    data = [ok, cw(i)==1];
+    s(iSC(i)) = staircase('update',s(iSC(i)),data);
+    rec(i,5:7) = [con data(1) choice==1];
 
 end % trials loop
 
