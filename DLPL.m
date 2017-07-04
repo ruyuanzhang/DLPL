@@ -1,27 +1,27 @@
 % This script illustrate how a deep learning system (Alexnet) interact
 % with a psychophysical staircase program.
 
-%   fname is mat file name to save result. 
-%   startContrast is start contrast for staircase. 
+%   fname is mat file name to save result.
+%   startContrast is start contrast for staircase.
 %   corner is either 'NW' or 'NE', defining the diagonal.
 %   referenceOrientation is the refence orientation in this block,choose
 %   -35 or 55
 %   noiseLevel is the noise contrast (0 to 1).
-% 
+%
 % Training program using four staircases (2/1 and 3/1 at two locations).
-% 
+%
 % NoiseGabor2('sj1_block1', [0.2 0.3], 'NW', 55 ,1) will use highest noise, the
 % stimulus will be at NW or SE corner, the start contast will be 0.2 and
 % 0.3 for 2/1 and 3/1 staircases, the reference orientation is 55 deg and the result will be saved to
 % sj1_block1.mat.
 %% set up some stim parameters
 close all; clear all;
-KbName('UnifyKeyNames'); 
+KbName('UnifyKeyNames');
 
 % ========== parameters you want to change
-fname          ='junk_block1'; 
+fname          ='junk_block1';
 p.noiseLevel   = 2;  %0 ~ 7
-p.corner       ='NE'; 
+p.corner       ='NE';
 p.startContrast=[0.9 0.9];
 % =========================================
 
@@ -39,7 +39,7 @@ p.stimradius = 1.5;%1.5deg, use deg here to create gabor
 p.sigma  = 0.4; % use deg, for creating gabor
 
 p.factor = 2; % noise pixel size
-p.nTrial =[76 84]; % for 2/1 and 3/1 staircases, 
+p.nTrial =[76 84]; % for 2/1 and 3/1 staircases,
 % trial setting
 p.nTrials=sum(p.nTrial)*2; % total, one run should be 320 trials
 p.rseed=ClockRandSeed; % set random number generator
@@ -119,13 +119,13 @@ cw=cw(ind);
 % iTrial iSC isUpper isCW contrast ok rt leftKey
 rec=nan(p.nTrials,8);
 rec(:,1:4)=[(1:p.nTrials)' iSC mod(iSC,2) cw==1];
-%    
+%
 %% do it
 n = 1;
 for i=1:p.nTrials
- 
+
     con=s(iSC(i)).stimVal; % obtain contrast for this trial
-    
+
     % generate noise patch, we first try noise level = 0;
     for j=1:2 % make 2 noise tex for each trial
         img=gNoise(mN)*p.noiseLevel+0.5; % [0 1]
@@ -133,7 +133,7 @@ for i=1:p.nTrials
         img(outCircle)=0.5; % circle mask
         noise{j}=img;
     end
-    
+
     if cw(i)==-1% + 12deg
         gabortmp=uint8(127*gabor1*con+127); %0~254, we change the contrast,
     else
@@ -144,7 +144,7 @@ for i=1:p.nTrials
     % put gabor on gray background
     imgtmp(r(2)+1:r(4),r(1)+1:r(3))=gabortmp;
     imgtmp=uint8(imgtmp);
-    
+
     %% ================= This section is for DL model======
     % imgtmp is the image to provide to Alexnet. Then Alexnet should make a
     % choice here. 1:counterclockwise rotated;2:clockwise rotated
@@ -153,14 +153,14 @@ for i=1:p.nTrials
 
     figure;imshow(imgtmp);
     drawnow;
-    
+
     [choice, secs]=WaitTill(KbName({'LeftArrow', 'RightArrow','Escape'})); % for response); % wait for response;
-    
+
     choice
 
     close all;
     %% =================
-    % collect and update staircase    
+    % collect and update staircase
     ok = (choice-1)==(cw(i)==1); % correct or not,cw=-1,counterclockwise,cw=1,clockwise
     cw(i)
     ok
@@ -171,7 +171,7 @@ for i=1:p.nTrials
 end % trials loop
 
 %% finish and save data
-save(fname,'p','s','rec');  
+save(fname,'p','s','rec');
 s=staircase('compute',s,3); % discard some reversals
 staircase('plot',s);  % plot the result
 for i=1:2
@@ -180,7 +180,7 @@ for i=1:2
 end
 fprintf('\n\n The startContrast for next block are [%.3g %3.g]\n',p.startVal);
 p.finish=datestr(now);
-save(fname,'p','s','rec');        
+save(fname,'p','s','rec');
 
 
 
