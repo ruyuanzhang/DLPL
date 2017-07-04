@@ -81,7 +81,7 @@ state = initState(net, p);
 
 
 %% setup stimulus
-mN=round(p.stimsize*2/p.factor); % # of noise pixels, This is useful
+mN=round(p.stimsize/p.factor); % # of noise pixels, This is useful
 % derive stim location
 drect=CenterRect([0 0 p.stimsize p.stimsize],p.screenRect);
 if strcmpi(p.corner(1:2),'NE')
