@@ -20,7 +20,7 @@ KbName('UnifyKeyNames');
 
 % ========== parameters you want to change
 fname          ='junk_block1'; 
-p.noiseLevel   = 1;  
+p.noiseLevel   = 7;  
 p.corner       ='NE'; 
 p.startContrast=[0.9 0.9];
 % =========================================
@@ -55,17 +55,25 @@ p.rseed=ClockRandSeed; % set random number generator
 % relu6: poolShape = [ 12  12] clsShape = [4096 2]
 % relu7: poolShape = [ 12  12] clsShape = [4096 2]
 p.CNNModel = 'D:/CNNModel/imagenet-caffe-alex.mat';
-p.layerName = 'relu1';
-p.modelType = 'simplenn';
-p.useGPU = true;
-p.poolShape = [148 148];
-p.poolMethod = 'avg';
-p.clsShape = [96 2];
-p.substractAverage = true;
-p.learningRate = 1e-3;
-p.weightDecay = 5e-4;
-p.nesterovUpdate = false;
-p.momentum = 0.9;
+
+layerName = {'relu1', 'relu2', 'relu3', 'relu4', 'relu5', 'relu6', 'relu7'};
+
+for l = 1:numel(layerName)
+close all
+clear s
+p.layerName = layerName{l};
+p = makeParams(p);
+
+% p.modelType = 'simplenn';
+% p.useGPU = true;
+% p.poolShape = [148 148];
+% p.poolMethod = 'avg';
+% p.clsShape = [96 2];
+% p.substractAverage = true;
+% p.learningRate = 1e-3;
+% p.weightDecay = 5e-4;
+% p.nesterovUpdate = false;
+% p.momentum = 0.9;
 
 net = loadCNNModel(p.CNNModel, p.layerName, p.modelType);
 net = addGPooling(net, p.poolShape, p.poolMethod);
@@ -98,7 +106,7 @@ gabor1=sind(360*p.sf*(x*cosd(p.rAngle-p.dAngle)+y*sind(p.rAngle-p.dAngle))); %-1
 gabor2=sind(360*p.sf*(x*cosd(p.rAngle+p.dAngle)+y*sind(p.rAngle+p.dAngle))); %-1~1
 gabor1=gabor1.*exp(-((x.^2+y.^2)/2/p.sigma.^2)); % apply mask?%-1~1
 gabor2=gabor2.*exp(-((x.^2+y.^2)/2/p.sigma.^2)); % apply mask?%-1~1
-outCircle=(x.^2+y.^2>p.stimsize.^2); % circle mask
+outCircle=((x.^2+y.^2)>p.stimradius.^2); % circle mask
 tex=zeros(1,2); % prealocate noise tex
 %% set up staircases
 % Random order for two staircases, up/low location and rotating angle.
@@ -128,16 +136,16 @@ for i=1:p.nTrials
     
     % generate noise patch, we first try noise level = 0;
     for j=1:2 % make 2 noise tex for each trial
-        img=gNoise(mN)*p.noiseLevel+0.5; % [0 1]
+        img=gNoise(mN)*p.noiseLevel/2; % [0 1]
         img=Expand(img,p.factor);
-        img(outCircle)=0.5; % circle mask
+        img(outCircle)=0; % circle mask
         noise{j}=img;
     end
     
     if cw(i)==-1% + 12deg
-        gabortmp=uint8(127*gabor1*con+127); %0~254, we change the contrast,
+        gabortmp=uint8(127*(gabor1 + noise{1})*con+127); %0~254, we change the contrast,
     else
-        gabortmp=uint8(127*gabor2*con+127); %0~254, we change the contrast,
+        gabortmp=uint8(127*(gabor2 + noise{1})*con+127); %0~254, we change the contrast,
     end
     %create a gray image
     imgtmp = 127*ones(p.screenRect(4),p.screenRect(3));
@@ -186,6 +194,9 @@ fprintf('\n\n The startContrast for next block are [%.3g %3.g]\n',p.startVal);
 p.finish=datestr(now);
 save(fname,'p','s','rec');        
 
+resultFrame = getframe(gcf);
+imwrite(resultFrame.cdata, ['results/' p.layerName '_noise_' num2str(p.noiseLevel) '_result.jpg']);
+end
 
 
 % % return gaussian noise image within [-0.5 0.5]
