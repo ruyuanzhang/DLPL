@@ -18,7 +18,7 @@
 cl;
 % ========== parameters you want to change ==========
 fname          ='junk_block1'; 
-p.noiseLevel   = 2;  %0 ~ 7
+p.noiseLevel   = 7;  %0 ~ 7
 p.corner       ='NE'; 
 p.startContrast=[0.9 0.9];
 % =========================================
